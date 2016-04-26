@@ -84,15 +84,9 @@
             }
         };
 
-        $("#src-tag").val(document.documentElement.outerHTML)
-            .css({
-                'white-space': 'pre',
-                'font-family': 'Menlo,Monaco,Consolas,"Courier New",monospace'
-            })
-            .attr("rows", document.documentElement.outerHTML.split("\n").length + 1)
-            .click(function () {
-                $(this).select();
-            });
+        $inputsAndTextareas.click(function () {
+            $(this).select();
+        });
 
         $inp_files.change(loadImageFileAsURL);
     }

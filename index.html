@@ -14,41 +14,39 @@
 <div class="container">
     <header class="text-center">
         <h1>File to data URL</h1>
-        <small>Simply choose a file,</small>
+        <small>Simply choose a file and wait! If the file is large the procedure is likely to fail.</small>
     </header>
-    <ul class="nav nav-tabs">
-        <li class="active"><a href="#tool" data-toggle="tab">Tool</a></li>
-        <li><a href="#source" data-toggle="tab">Source</a></li>
-    </ul>
-    <div class="tab-content">
-        <div id="tool" class="tab-pane fade in active">
-            <div class="form-horizontal">
-                <div class="form-group">
-                    <label for="inputFileToLoad" class="col-lg-2 col-md-4 col-sm-6">Select a File to Load:</label>
-                    <div class="col-lg-10 col-md-8 col-sm-6">
-                        <input id="inputFileToLoad" type="file" class="form-control"
-                               onchange="loadImageFileAsURL();"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-lg-2 col-md-4 col-sm-6">Mode:</label>
-                    <div class="col-lg-10 col-md-8 col-sm-6">
-                        <label><input name="mode" type="radio" value="dl" checked/> <span>Download</span></label>
-                        <label><input name="mode" type="radio" value="txt"/>
-                            <span>Display in textarea</span></label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-lg-2 col-md-4 col-sm-6" for="textAreaFileContents">File contents in
-                        Base64:</label>
-                    <div class="col-lg-10 col-md-8 col-sm-6">
-                        <textarea id="textAreaFileContents" class="form-control"></textarea>
-                    </div>
-                </div>
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label for="inputFileToLoad" class="col-lg-2 col-md-4 col-sm-6">Select a File to Load:</label>
+            <div class="col-lg-10 col-md-8 col-sm-6">
+                <input id="inputFileToLoad" type="file" class="form-control"/>
             </div>
         </div>
-        <div id="source" class="tab-pane fade">
-            <textarea id="src-tag" class="form-control" readonly>foo</textarea>
+        <div class="form-group">
+            <label class="col-lg-2 col-md-4 col-sm-6">Mode:</label>
+            <div class="col-lg-10 col-md-8 col-sm-6">
+                <label><input name="mode" type="radio" value="dl" checked/> <span>Download</span></label>
+                <label><input name="mode" type="radio" value="txt"/>
+                    <span>Display in textarea</span></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 col-md-4 col-sm-6" for="textAreaFileContents">
+                File contents in Base64:
+            </label>
+            <div class="col-lg-10 col-md-8 col-sm-6">
+                <textarea id="textAreaFileContents" class="form-control" rows="10"></textarea>
+            </div>
+        </div>
+        <div class="alert alert-success" id="status" style="text-align:center">
+            Ready for work!
+        </div>
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="45" aria-valuemin="0"
+                 aria-valuemax="100" style="width: 0" id="progressbar">
+                Idle
+            </div>
         </div>
     </div>
 </div>
@@ -59,85 +57,14 @@
         <a href="mailto:a.molcanovas@gmail.com">Alorel</a>
     </small>
     <small style="display:block">
-        <span>See more stuff on</span>
-        <a href="https://github.com/Alorel" target="_blank">my GitHub</a>
+        <span>See the source on</span>
+        <a href="https://github.com/Alorel/js-file-to-data-url" target="_blank">GitHub</a>
     </small>
 </footer>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
         integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
         crossorigin="anonymous"></script>
-<script type="text/javascript">
-    'use strict';
-
-    /**
-     * Our file input element
-     * @type {HTMLInputElement|HTMLElement}
-     */
-    var inp_files = document.getElementById("inputFileToLoad"),
-
-            /**
-             * Our contents textarea
-             * @type {*|jQuery|HTMLElement}
-             */
-            $inp_contents = $("#textAreaFileContents"),
-
-            /**
-             * Our conversion mode
-             * @type {*|jQuery|HTMLElement}
-             */
-            $mode = $("input[name=mode]");
-
-    /**
-     * Download the file's contents
-     * @param {String} filename The download filename
-     * @param {String} text The file contents
-     */
-    function download(filename, text) {
-        var element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-        element.setAttribute('download', filename);
-
-        element.style.display = 'none';
-        document.body.appendChild(element);
-
-        element.click();
-
-        document.body.removeChild(element);
-    }
-
-    /**
-     * Our loader function
-     */
-    function loadImageFileAsURL() {
-        var filesSelected = inp_files.files;
-        if (filesSelected.length > 0) {
-            var fileToLoad = filesSelected[0],
-                    fileReader = new FileReader();
-
-            fileReader.onload = function (fileLoadedEvent) {
-                if ($mode.filter(":checked").val() === "dl") {
-                    $inp_contents.val("");
-                    download(fileToLoad.name + ".txt", fileLoadedEvent.target.result);
-                } else {
-                    $inp_contents.val(fileLoadedEvent.target.result).focus().select();
-                }
-            };
-
-            fileReader.readAsDataURL(fileToLoad);
-        }
-    }
-
-    $("#src-tag").val(document.documentElement.outerHTML)
-            .css({
-                'white-space': 'pre',
-                'font-family': 'Menlo,Monaco,Consolas,"Courier New",monospace'
-            })
-            .attr("rows", document.documentElement.outerHTML.split("\n").length + 1)
-            .click(function () {
-                $(this).select();
-            });
-
-</script>
+<script src="index.js"></script>
 </body>
 </html>

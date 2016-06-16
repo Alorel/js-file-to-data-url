@@ -1,18 +1,36 @@
-(function ($) {
+(function () {
     'use strict';
-    var $status = $("#status"),
+    var status = document.getElementById("status"),
+        allInputs = document.querySelectorAll("input:not(.btn-default)"),
+        /**
+         * Enable/disable inputs
+         * @param {boolean} disabled True to disable, false to enable
+         */
+        inputsDisabled = function (disabled) {
+            var i = 0,
+                call, args;
 
-        $inputsAndTextareas = $("input,textarea");
+            if (disabled) {
+                call = HTMLElement.prototype.setAttribute;
+                args = ["disabled", "true"];
+            } else {
+                call = HTMLElement.prototype.removeAttribute;
+                args = ["disabled"];
+            }
 
-    if (!window.Worker) {
-        $status.text("Your browser does not support web workers! Please download Chrome or Firefox and try again")
-            .attr("class", "alert alert-danger");
-        $inputsAndTextareas.prop("disabled", true);
+            for (; i < allInputs.length; i++) {
+                call.apply(allInputs[i], args);
+            }
+        };
+
+    if (typeof window.Worker === "undefined") {
+        status.textContent = "Your browser does not support web workers! Please download Chrome or Firefox and try again";
+        status.setAttribute("class", "alert alert-danger");
+
+        inputsDisabled(true);
     } else {
-        var $inp_files = $("#inputFileToLoad"),
-            $inp_contents = $("#textAreaFileContents"),
-            $progressbar = $("#progressbar"),
-            $mode = $("input[name=mode]"),
+        var inp_files = document.getElementById("inputFileToLoad"),
+            progressbar = document.getElementById("progressbar"),
             /**
              * Our web worker
              * @type {Worker}
@@ -26,12 +44,16 @@
              */
             setProgress = function (loaded, total) {
                 var val = Math.round(loaded / total * 100);
-                $progressbar.css("width", val + "%").text(val + "%");
 
                 if (val == 100) {
-                    $progressbar.removeClass("active");
+                    progressbar.textContent = "100%";
+                    progressbar.style.width = "100%";
+                    progressbar.classList.remove("active");
                 } else {
-                    $progressbar.addClass("active");
+                    requestAnimationFrame(function () {
+                        progressbar.textContent = val + "%";
+                        progressbar.style.width = val + "%";
+                    });
                 }
             },
 
@@ -57,37 +79,34 @@
              * Our loader function
              */
             loadImageFileAsURL = function () {
-                $inputsAndTextareas.prop("disabled", false);
+                inputsDisabled(true);
+                progressbar.classList.add("active");
                 setProgress(0, 1);
-                $status.text("Working through the file. This might take a while if the file is large (and it might freeze your browser)")
-                    .attr("class", "alert alert-info");
+                status.textContent = "Working through the file. This might take a while if the file is large (and it might freeze your browser)";
+                status.setAttribute("class", "alert alert-info");
+
                 worker.postMessage({
-                    file_list: $inp_files[0].files,
-                    download: $mode.filter(":checked").val() === "dl"
+                    file_list: inp_files.files,
+                    download: document.querySelector("[name=mode]:checked").value === "dl"
                 });
-                $inp_contents.val("");
             };
 
         worker.onmessage = function (r) {
             if (r.data.type === "progress") {
                 setProgress(r.data.loaded, r.data.total);
             } else {
-                $inputsAndTextareas.prop("disabled", false);
-                $status.text("Ready for work!")
-                    .attr("class", "alert alert-success");
+                inputsDisabled(false);
+                status.textContent = "Ready for work!";
+                status.setAttribute("class", "alert alert-success");
                 setProgress(1, 1);
                 if (r.data.download) {
                     download(r.data.file_name + ".txt", r.data.data);
                 } else {
-                    $inp_contents.val(r.data.data).focus().select();
+                    window.open(r.data.data, "Result");
                 }
             }
         };
 
-        $inputsAndTextareas.click(function () {
-            $(this).select();
-        });
-
-        $inp_files.change(loadImageFileAsURL);
+        document.getElementById("go").addEventListener("click", loadImageFileAsURL);
     }
-})(jQuery);
+})();

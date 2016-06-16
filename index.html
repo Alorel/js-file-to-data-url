@@ -26,18 +26,13 @@
         <div class="form-group">
             <label class="col-lg-2 col-md-4 col-sm-6">Mode:</label>
             <div class="col-lg-10 col-md-8 col-sm-6">
-                <label><input name="mode" type="radio" value="dl" checked/> <span>Download</span></label>
-                <label><input name="mode" type="radio" value="txt"/>
-                    <span>Display in textarea</span></label>
+                <label><input name="mode" type="radio" value="txt" checked/>
+                    <span>window.open()</span></label>
+                <label><input name="mode" type="radio" value="dl"/> <span>Download</span></label>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-lg-2 col-md-4 col-sm-6" for="textAreaFileContents">
-                File contents in Base64:
-            </label>
-            <div class="col-lg-10 col-md-8 col-sm-6">
-                <textarea id="textAreaFileContents" class="form-control" rows="10"></textarea>
-            </div>
+        <div class="form-group text-center">
+            <button type="button" class="btn btn-primary" id="go">Go!</button>
         </div>
         <div class="alert alert-success" id="status" style="text-align:center">
             Ready for work!
@@ -61,10 +56,7 @@
         <a href="https://github.com/Alorel/js-file-to-data-url" target="_blank">GitHub</a>
     </small>
 </footer>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
-        integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
-        crossorigin="anonymous"></script>
+<script src="https://cdn.rawgit.com/paulirish/1579671/raw/682e5c880c92b445650c4880a6bf9f3897ec1c5b/rAF.js"></script>
 <script src="index.js"></script>
 </body>
 </html>
